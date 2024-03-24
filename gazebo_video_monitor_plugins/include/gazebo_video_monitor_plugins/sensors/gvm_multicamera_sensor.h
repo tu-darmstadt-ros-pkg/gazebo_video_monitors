@@ -91,11 +91,16 @@ class GZ_SENSORS_VISIBLE GvmMulticameraSensor : public Sensor {
 
     ignition::math::Pose3d getWorldPose() const {
 #if GAZEBO_MAJOR_VERSION > 10
-      return parent_link->WorldPose() * relative_pose;
+      ignition::math::Pose3d world_pose = parent_link->WorldPose();
+      ignition::math::Quaterniond world_rot_yaw(0.0, 0.0, world_pose.Yaw());
+      ignition::math::Pose3d world_pose_yaw(world_pose.Pos(), world_rot_yaw);
+      return world_pose_yaw * relative_pose;
 #else
       return relative_pose * parent_link->WorldPose();
 #endif
     }
+
+
 
     void setParent(const physics::LinkPtr &link) {
       parent_name = link->GetScopedName();
@@ -172,7 +177,7 @@ class GZ_SENSORS_VISIBLE GvmMulticameraSensor : public Sensor {
         camera->SetWorldPose(relative_pose);
       else
         camera->SetWorldPose(getWorldPose());
-      camera->AttachToVisual(parent_id, true);
+//      camera->AttachToVisual(parent_id, false);
     }
 
     void attachToLink(const physics::LinkPtr &link,

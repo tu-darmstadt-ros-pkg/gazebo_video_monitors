@@ -263,7 +263,10 @@ void GvmMulticameraSensor::Fini() {
 void GvmMulticameraSensor::Render() {
   if (cameras_.empty() or not IsActive() or not NeedsUpdate()) return;
 
-  for (auto &camera : cameras_) camera.second.camera->Render();
+  for (auto &camera : cameras_) {
+    camera.second.camera->SetWorldPose( camera.second.getWorldPose());
+    camera.second.camera->Render();
+  }
 
   rendered_ = true;
   lastMeasurementTime = scene->SimTime();
